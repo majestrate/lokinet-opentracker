@@ -57,6 +57,7 @@ def announce():
             infohash,
             for_peer=peerinfo[-1],
             numwant=request.args.get("numwant", default=50, type=int),
+            since=config.interval * 2,
         )
         return bencode({"interval": config.interval, "peers": peers})
     except Exception as ex:
