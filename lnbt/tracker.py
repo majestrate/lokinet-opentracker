@@ -20,16 +20,16 @@ def get_loki_addr():
 def announce():
     try:
         infohash = b""
+        peer_id = b""
         for part in request.query_string.split(b"&"):
             if part.startswith(b"info_hash="):
                 infohash = unquote_to_bytes(part[10:])
+            if part.startswith(b"peer_id="):
+                peer_id = unquote_to_bytes(part[8:])
         if len(infohash) == 0:
             raise Exception("no infohash provided")
         if len(infohash) != 20:
             raise Exception("invalid infohash")
-        peer_id = b""
-        if "peer_id" in request.args:
-            peer_id = request.args["peer_id"].encode("ascii")
         if len(peer_id) == 0:
             raise Exception("no peer_id provided")
         if len(peer_id) != 20:
