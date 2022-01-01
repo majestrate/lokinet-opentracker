@@ -67,4 +67,4 @@ def announce():
 
 @app.route("/")
 def index():
-    return render_template("index.html", host=request.host)
+    return render_template("index.html", host=request.host, stats=swarm.get_stats())

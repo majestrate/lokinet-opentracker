@@ -99,6 +99,16 @@ def get_peers(infohash, for_peer, numwant=50, since=300):
     return peers
 
 
+def get_stats():
+    stats = dict()
+    for row in query(
+        "SELECT COUNT(DISTINCT(infohash)) AS swarms, COUNT(DISTINCT(peer_id)) AS peers FROM bt_swarm_peers"
+    ):
+        stats["swarms"] = row["swarms"]
+        stats["peers"] = row["peers"]
+    return stats
+
+
 query(
     "CREATE TABLE IF NOT EXISTS bt_swarm_peers (infohash VARCHAR(40) NOT NULL, seed BOOL DEFAULT FALSE, peer_id VARCHAR(64) NOT NULL, addr VARCHAR(64) NOT NULL, port INTEGER NOT NULL, last_active_at BIGINT NOT NULL, PRIMARY KEY(infohash, peer_id))"
 )
