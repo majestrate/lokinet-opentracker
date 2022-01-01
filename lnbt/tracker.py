@@ -66,4 +66,4 @@ def announce():
 
 @app.route("/")
 def index():
-    return f"announce url: http://{request.host}/announce"
+    return f"announce url: http://{request.host}/announce\n\nhttps://github.com/majestrate/lokinet-opentracker\n"
