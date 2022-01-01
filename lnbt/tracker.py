@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 import socket
 from oxenc import bt_serialize as bencode
 from . import swarm
@@ -66,4 +66,4 @@ def announce():
 
 @app.route("/")
 def index():
-    return f"announce url: http://{request.host}/announce\n\nhttps://github.com/majestrate/lokinet-opentracker\n"
+    return render_template("index.html", host=request.host)
