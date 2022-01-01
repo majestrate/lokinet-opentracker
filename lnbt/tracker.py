@@ -66,4 +66,4 @@ def announce():
 
 @app.route("/")
 def index():
-    return "opentracker"
+    return f"announce url: http://{request.host}/announce"
