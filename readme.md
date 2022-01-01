@@ -4,7 +4,7 @@ lokinet bittorrent tracker
 requires:
 
 * python3-flask
-* python3-oxenc
+* [python3-oxenc](https://github.com/oxen-io/oxen-encoding)
 * python3-sqlalchemy
 * python3-psycopg2
 
