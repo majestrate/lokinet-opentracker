@@ -2,7 +2,9 @@ from flask import Flask, request
 import socket
 from oxenc import bt_serialize as bencode
 from . import swarm
-from urllib.parse import unquote_to_bytes
+from urllib.parse import unquote_to_bytes, parse_qsl
+from binascii import hexlify
+import struct
 
 app = Flask(__name__)
 
@@ -10,13 +12,29 @@ app = Flask(__name__)
 
 def get_loki_addr():
     """ get the loki address of a requester """
-    return socket.gethostbyaddr(request.remote_addr.split(':')[0])[0]
+    ip = str(request.remote_addr)
+    return socket.gethostbyaddr(ip.split(':')[0])[0]
 
 @app.route("/announce")
 def announce():
     try:
-        infohash = unquote_to_bytes(request.args.get("info_hash"))
-        peerinfo = (get_loki_addr(), request.args.get("port", type=int), unquote_to_bytes(request.args.get("peer_id")))
+        infohash = b''
+        for part in request.query_string.split(b'&'):
+            if part.startswith(b"info_hash="):
+                infohash = unquote_to_bytes(part[10:])
+        if len(infohash) == 0:
+            raise Exception("no infohash provided")
+        if len(infohash) != 20:
+            raise Exception("invalid infohash")
+        peer_id = b''
+        if 'peer_id' in request.args:
+            peer_id = request.args["peer_id"].encode('ascii')
+        if len(peer_id) == 0:
+            raise Exception("no peer_id provided")
+        if len(peer_id) != 20:
+            raise Exception("invalid peer_id")
+
+        peerinfo = (get_loki_addr(), request.args.get("port", type=int), peer_id)
         event = None
         if 'event' in request.args:
             event = request.args.get("event")
@@ -33,8 +51,9 @@ def announce():
         peers = swarm.get_peers(infohash, for_peer=peerinfo[-1], numwant=request.args.get("numwant", default=50, type=int))
         return bencode({"interval": 600, "peers": peers})
     except Exception as ex:
+        app.logger.warn(f"{ex}")
         return bencode({"failure reason": f"{ex}"})
-    
+
 @app.route("/")
 def index():
     return "opentracker"
