@@ -10,4 +10,4 @@ requires:
 
 running:
 
-    FLASK_APP=lnbt.tracker flask run -h localhost.loki -p 6680
+    FLASK_APP=lnbt.tracker FLASK_ENV=prod flask run -h localhost.loki -p 6680
