@@ -49,7 +49,7 @@ def announce():
         if started:
             swarm.add_peer(infohash, *peerinfo)
         if completed and not stopped:
-            swarm.promote_peer(infohash, *peerinfo)
+            swarm.add_peer(infohash, *peerinfo, seed=True)
 
         swarm.peer_active(infohash, peerinfo[-1])
         swarm.prune(infohash, threshold=config.interval * 4)
