@@ -4,7 +4,7 @@ class Config:
 
 config = Config()
 
-config.db_url = "postgresql://jeff:jeff@localhost/torrents"
+config.db_url = "sqlite://"
 config.interval = 60 * 5
 
 
