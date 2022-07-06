@@ -1,5 +1,4 @@
 from flask import Flask, request, render_template
-import socket
 from oxenc import bt_serialize as bencode
 from . import swarm
 from .config import config
@@ -7,13 +6,22 @@ from urllib.parse import unquote_to_bytes, parse_qsl
 from binascii import hexlify
 import struct
 
+import dns.resolver
+
+resolver = dns.resolver.get_default_resolver()
+resolver.nameservers = [config.lokinet_dns]
+
+
 app = Flask(__name__)
 
 
-def get_loki_addr():
+def get_loki_addr(ip=None):
     """ get the loki address of a requester """
-    ip = str(request.remote_addr)
-    return socket.gethostbyaddr(ip.split(":")[0])[0]
+    if ip is None:
+        ip = str(request.remote_addr).split(':')[0]
+    ans = resolver.resolve_address(ip)
+    if ans:
+        return ans[0]
 
 
 @app.route("/announce")
