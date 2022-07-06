@@ -6,7 +6,6 @@ requires:
 * python3-flask
 * [python3-oxenc](https://github.com/oxen-io/oxen-encoding)
 * python3-sqlalchemy
-* python3-psycopg2
 * python3-dnspython
 
 running:
