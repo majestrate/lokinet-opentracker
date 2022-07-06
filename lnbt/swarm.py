@@ -10,10 +10,10 @@ hexlify = lambda x: hexit(x).decode("ascii")
 
 engine = create_engine(config.db_url)
 
+conn = engine.connect()
 
 def query(sql, **kwargs):
-    with engine.connect() as conn:
-        return conn.execute(text(sql), **kwargs)
+    return conn.execute(text(sql), **kwargs)
 
 
 def remove_peer(infohash, peer_id):

@@ -4,7 +4,7 @@ class Config:
 
 config = Config()
 
-config.db_url = "sqlite://"
+config.db_url = "sqlite:///:memory?check_same_thread=False"
 config.interval = 60 * 5
 
 
