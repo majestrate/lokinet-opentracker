@@ -11,14 +11,17 @@ import dns.resolver
 resolver = dns.resolver.get_default_resolver()
 resolver.nameservers = [config.lokinet_dns]
 
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app)
 
 
-def get_loki_addr(ip=None):
+def get_loki_addr(addr=None):
     """ get the loki address of a requester """
-    if ip is None:
-        ip = str(request.remote_addr).split(':')[0]
+    if addr is None:
+        addr = request.remote_addr
+    ip = str(addr).split(':')[0]
     ans = resolver.resolve_address(ip)
     if ans:
         return ans[0]
