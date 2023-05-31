@@ -18,10 +18,10 @@ app.wsgi_app = ProxyFix(app.wsgi_app)
 
 
 def get_loki_addr(addr=None):
-    """ get the loki address of a requester """
+    """get the loki address of a requester"""
     if addr is None:
         addr = request.remote_addr
-    ip = str(addr).split(':')[0]
+    ip = str(addr).split(":")[0]
     ans = resolver.resolve_address(ip)
     if ans:
         return ans[0]
@@ -46,7 +46,12 @@ def announce():
         if len(peer_id) != 20:
             raise Exception("invalid peer_id")
 
-        peerinfo = (get_loki_addr(), request.args.get("port", type=int), peer_id)
+        peerinfo = {
+            "ip": get_loki_addr(),
+            "port": request.args.get("port", type=int),
+            "peer_id": peer_id,
+        }
+
         event = None
         if "event" in request.args:
             event = request.args.get("event")
@@ -56,17 +61,14 @@ def announce():
         )
         stopped = event == "stopped"
         if stopped:
-            swarm.remove_peer(infohash, peerinfo[-1])
-        if started:
-            swarm.add_peer(infohash, *peerinfo)
-        if completed and not stopped:
-            swarm.add_peer(infohash, *peerinfo, seed=True)
+            swarm.remove_peer(infohash, peer_id)
+        elif started or completed:
+            swarm.upsert_peer(infohash, peer_id, **peerinfo)
 
-        swarm.peer_active(infohash, peerinfo[-1])
-        swarm.prune(infohash, threshold=config.interval * 4)
+        swarm.prune([infohash], threshold=config.interval * 4)
         peers = swarm.get_peers(
             infohash,
-            for_peer=peerinfo[-1],
+            for_peer=peer_id,
             numwant=request.args.get("numwant", default=50, type=int),
             since=config.interval * 2,
         )
