@@ -4,7 +4,7 @@ requires:
 
 * python3-flask
 * [python3-oxenc](https://github.com/oxen-io/oxen-encoding)
-* python3-sqlalchemy
+* python3-redis
 * python3-dnspython
 
 running:
@@ -15,12 +15,12 @@ then set up to run behind nginx:
 
 ```
 server {
-  # you MUST change this listen directive to use your.lokinet.ip.here:80
-  listen 127.0.0.1:80;
+  listen put_local_lokinet_ip_here:80;
+  server_name tracker.whatever.loki;
   location / {
     proxy_redirect off;
     proxy_set_header Host $host;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Real-IP $remote_addr;
     proxy_pass http://127.0.0.1:6680;
   }
 }
